@@ -1,0 +1,54 @@
+{
+  "id": "2e3f4a5b-6c7d-4e8f-9a0b-1c2d3e4f5a6b",
+  "template_key": "workshop_reminder_pre",
+  "name": "Rappel Atelier - Avant la Session",
+  "description": "Email envoyé 48h avant le début d'un atelier pour rappeler les détails aux participants",
+  "subject": "Rappel: {{workshop_title}} commence dans 2 jours",
+  "body_html": "<html><body><h1>Bonjour {{participant_name}},</h1><p>Nous vous rappelons que votre atelier <strong>{{workshop_title}}</strong> aura lieu le <strong>{{workshop_date}}</strong> à <strong>{{workshop_time}}</strong>.</p><h2>Détails pratiques</h2><ul><li><strong>Lieu:</strong> {{location}}</li><li><strong>Durée:</strong> {{duration}}</li></ul><p>{{#is_remote}}<strong>Lien visio:</strong> <a href=\"{{visio_link}}\">Rejoindre la session</a>{{/is_remote}}</p><p>À très bientôt!</p><p>L'équipe 1er Degré</p></body></html>",
+  "body_text": "Bonjour {{participant_name}},\n\nNous vous rappelons que votre atelier {{workshop_title}} aura lieu le {{workshop_date}} à {{workshop_time}}.\n\nLieu: {{location}}\nDurée: {{duration}}\n\n{{#is_remote}}Lien visio: {{visio_link}}{{/is_remote}}\n\nÀ très bientôt!\nL'équipe 1er Degré",
+  "variables": [
+    {
+      "name": "participant_name",
+      "description": "Nom du participant",
+      "required": true
+    },
+    {
+      "name": "workshop_title",
+      "description": "Titre de l'atelier",
+      "required": true
+    },
+    {
+      "name": "workshop_date",
+      "description": "Date de l'atelier (format lisible)",
+      "required": true
+    },
+    {
+      "name": "workshop_time",
+      "description": "Heure de début",
+      "required": true
+    },
+    {
+      "name": "location",
+      "description": "Adresse du lieu",
+      "required": false
+    },
+    {
+      "name": "duration",
+      "description": "Durée de l'atelier",
+      "required": true
+    },
+    {
+      "name": "is_remote",
+      "description": "Boolean indiquant si l'atelier est en ligne",
+      "required": true
+    },
+    {
+      "name": "visio_link",
+      "description": "Lien de visioconférence",
+      "required": false
+    }
+  ],
+  "tenant_id": "1er-Degré",
+  "created_at": "2025-01-10T09:00:00Z",
+  "updated_at": "2025-08-15T14:30:00Z"
+}

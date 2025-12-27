@@ -1,0 +1,22 @@
+{
+  "id": "5e6f7a8b-9c0d-4e1f-2a3b-4c5d6e7f8a9b",
+  "name": "Lycée Victor Hugo",
+  "legal_name": "Établissement Public Local d'Enseignement Victor Hugo",
+  "tax_id": "12345678901234",
+  "odoo_customer_id": "CUST-00542",
+  "billing_address": {
+    "street": "15 boulevard Victor Hugo",
+    "street2": "Service Comptabilité",
+    "city": "Paris",
+    "postal_code": "75016",
+    "region": "Île-de-France",
+    "country": "FR"
+  },
+  "contact_email": "comptabilite@lycee-hugo.ac-paris.fr",
+  "contact_phone": "+33 1 42 12 34 56",
+  "website": "https://www.lycee-hugo-paris.fr",
+  "notes": "Facturation trimestrielle - Délai de paiement 60 jours",
+  "tenant_id": "1er-Degré",
+  "created_at": "2024-03-15T09:00:00Z",
+  "updated_at": "2025-09-10T11:20:00Z"
+}

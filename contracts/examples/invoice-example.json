@@ -1,0 +1,30 @@
+{
+  "id": "9b0c1d2e-3f4a-4b5c-6d7e-8f9a0b1c2d3e",
+  "invoice_number": "INV-2025-1042",
+  "order_id": null,
+  "workshop_id": "3f4e5d6c-7b8a-4c9d-0e1f-2a3b4c5d6e7f",
+  "user_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+  "company_id": null,
+  "issue_date": "2025-10-01",
+  "due_date": "2025-10-31",
+  "line_items": [
+    {
+      "description": "Formation du Faire ensemble - Niveau Initiation",
+      "quantity": 1,
+      "unit_price": 45.00,
+      "amount": 45.00
+    }
+  ],
+  "subtotal": 45.00,
+  "tax_rate": 0.20,
+  "tax_total": 9.00,
+  "grand_total": 54.00,
+  "status": "paid",
+  "payment_date": "2025-10-01",
+  "payment_method": "Carte bancaire",
+  "notes": "Paiement en ligne via Stripe",
+  "pdf_url": "https://storage.1er-degre.fr/invoices/INV-2025-1042.pdf",
+  "tenant_id": "1er-Degré",
+  "created_at": "2025-10-01T14:22:00Z",
+  "updated_at": "2025-10-01T14:25:00Z"
+}

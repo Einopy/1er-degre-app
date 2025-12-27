@@ -1,0 +1,23 @@
+{
+  "id": "8e9f0a1b-2c3d-4e5f-6a7b-8c9d0e1f2a3b",
+  "order_number": "ORD-2025-10-1523",
+  "user_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+  "order_date": "2025-10-15T16:45:00Z",
+  "status": "processing",
+  "subtotal_amount": 70.00,
+  "tax_amount": 14.00,
+  "shipping_amount": 6.50,
+  "total_amount": 90.50,
+  "shipping_address": {
+    "street": "12 rue de la République",
+    "street2": "Appartement 3B",
+    "city": "Lyon",
+    "postal_code": "69002",
+    "region": "Auvergne-Rhône-Alpes",
+    "country": "FR"
+  },
+  "notes": "Livraison entre 12h et 14h si possible",
+  "tenant_id": "1er-Degré",
+  "created_at": "2025-10-15T16:45:00Z",
+  "updated_at": "2025-10-15T17:02:00Z"
+}

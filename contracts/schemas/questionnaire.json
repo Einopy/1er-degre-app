@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1er-degre.fr/schemas/questionnaire.json",
+  "title": "Questionnaire",
+  "description": "Feedback or assessment questionnaire structure with questions and response types",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique questionnaire identifier",
+      "readOnly": true
+    },
+    "workshop_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Reference to workshop if questionnaire is workshop-specific"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Questionnaire title"
+    },
+    "description": {
+      "type": ["string", "null"],
+      "description": "Questionnaire purpose and instructions"
+    },
+    "questions": {
+      "type": "array",
+      "description": "List of questions in the questionnaire",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "description": "Unique identifier for this question"
+          },
+          "text": {
+            "type": "string",
+            "description": "Question text"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["multiple_choice", "text", "rating", "yes_no", "scale"],
+            "description": "Question response type"
+          },
+          "options": {
+            "type": ["array", "null"],
+            "description": "Available options for multiple choice questions",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scale_min": {
+            "type": ["integer", "null"],
+            "description": "Minimum value for scale questions"
+          },
+          "scale_max": {
+            "type": ["integer", "null"],
+            "description": "Maximum value for scale questions"
+          },
+          "is_required": {
+            "type": "boolean",
+            "description": "Whether response is required",
+            "default": false
+          },
+          "order": {
+            "type": "integer",
+            "description": "Display order of question"
+          }
+        },
+        "required": ["question_id", "text", "type", "is_required", "order"]
+      },
+      "minItems": 1
+    },
+    "is_active": {
+      "type": "boolean",
+      "description": "Whether questionnaire is currently accepting responses",
+      "default": true
+    },
+    "available_from": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Questionnaire becomes available at this time"
+    },
+    "available_until": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Questionnaire closes at this time"
+    },
+    "tenant_id": {
+      "type": "string",
+      "description": "Tenant identifier for multi-tenant isolation",
+      "default": "1er-Degré"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Questionnaire creation timestamp",
+      "readOnly": true
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "title",
+    "questions",
+    "is_active"
+  ]
+}

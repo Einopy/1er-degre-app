@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1er-degre.fr/schemas/user.json",
+  "title": "User",
+  "description": "User profile and account information for workshop participants, organizers, and staff",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique user identifier",
+      "readOnly": true
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "User email address (unique)"
+    },
+    "first_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "User's first name"
+    },
+    "last_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "User's last name"
+    },
+    "phone": {
+      "type": ["string", "null"],
+      "description": "Contact phone number"
+    },
+    "birthdate": {
+      "type": ["string", "null"],
+      "format": "date",
+      "description": "Date of birth in YYYY-MM-DD format"
+    },
+    "language_animation": {
+      "type": ["string", "null"],
+      "description": "Preferred language for animation and facilitation"
+    },
+    "outside_animation": {
+      "type": ["string", "null"],
+      "description": "External animation preferences or notes"
+    },
+    "signed_contract": {
+      "type": "boolean",
+      "description": "Whether user has signed required contract",
+      "default": false
+    },
+    "signed_contract_year": {
+      "type": ["integer", "null"],
+      "description": "Year the contract was signed",
+      "minimum": 2000
+    },
+    "roles": {
+      "type": "array",
+      "description": "User roles for permission management",
+      "items": {
+        "type": "string",
+        "enum": [
+          "participant",
+          "organizer",
+          "trainer",
+          "admin",
+          "volunteer",
+          "staff"
+        ]
+      },
+      "uniqueItems": true,
+      "default": ["participant"]
+    },
+    "stripe_customer_id": {
+      "type": ["string", "null"],
+      "description": "Stripe customer ID for payment processing"
+    },
+    "billing_address": {
+      "type": ["object", "null"],
+      "description": "Billing address for invoices and payments",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "street2": {
+          "type": ["string", "null"]
+        },
+        "city": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": ["string", "null"]
+        },
+        "country": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$",
+          "default": "FR"
+        }
+      },
+      "required": ["street", "city", "postal_code", "country"]
+    },
+    "shipping_address": {
+      "type": ["object", "null"],
+      "description": "Shipping address for physical products",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "street2": {
+          "type": ["string", "null"]
+        },
+        "city": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": ["string", "null"]
+        },
+        "country": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$",
+          "default": "FR"
+        }
+      },
+      "required": ["street", "city", "postal_code", "country"]
+    },
+    "status_labels": {
+      "type": "array",
+      "description": "Flexible tagging system for user status and categorization",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "tenant_id": {
+      "type": "string",
+      "description": "Tenant identifier for multi-tenant isolation",
+      "default": "1er-Degré"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Account creation timestamp",
+      "readOnly": true
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "email",
+    "first_name",
+    "last_name",
+    "signed_contract",
+    "roles"
+  ]
+}

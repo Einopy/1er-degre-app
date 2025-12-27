@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1er-degre.fr/schemas/calendar-event.json",
+  "title": "CalendarEvent",
+  "description": "Calendar event for workshop scheduling with recurrence and participant tracking",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique calendar event identifier",
+      "readOnly": true
+    },
+    "workshop_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Reference to workshop if event is workshop-related"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Event title"
+    },
+    "description": {
+      "type": ["string", "null"],
+      "description": "Event description and details"
+    },
+    "start_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Event start date and time"
+    },
+    "end_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Event end date and time"
+    },
+    "all_day": {
+      "type": "boolean",
+      "description": "Whether event is all-day",
+      "default": false
+    },
+    "location": {
+      "type": ["object", "null"],
+      "description": "Physical location for in-person events",
+      "properties": {
+        "venue_name": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "street2": {
+          "type": ["string", "null"]
+        },
+        "city": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": ["string", "null"]
+        },
+        "country": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$"
+        }
+      },
+      "required": ["venue_name", "city"]
+    },
+    "virtual_meeting_url": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "Video conference URL for remote events"
+    },
+    "recurrence_rule": {
+      "type": ["string", "null"],
+      "description": "RFC 5545 RRULE format for recurring events (e.g., FREQ=WEEKLY;BYDAY=MO,WE)"
+    },
+    "participant_ids": {
+      "type": "array",
+      "description": "References to enrolled participants",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "default": []
+    },
+    "organizer_ids": {
+      "type": "array",
+      "description": "References to event organizers",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "default": []
+    },
+    "reminder_settings": {
+      "type": ["object", "null"],
+      "description": "Reminder configuration for participants",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether reminders are enabled"
+        },
+        "minutes_before": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minutes before event to send reminder"
+        },
+        "method": {
+          "type": "string",
+          "enum": ["email", "sms", "both"],
+          "description": "Reminder delivery method"
+        }
+      },
+      "required": ["enabled"]
+    },
+    "tenant_id": {
+      "type": "string",
+      "description": "Tenant identifier for multi-tenant isolation",
+      "default": "1er-Degré"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Event creation timestamp",
+      "readOnly": true
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "title",
+    "start_time",
+    "end_time"
+  ]
+}

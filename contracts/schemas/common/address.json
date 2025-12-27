@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1er-degre.fr/schemas/common/address.json",
+  "title": "Address",
+  "description": "Standard address structure for billing and shipping",
+  "type": "object",
+  "properties": {
+    "street": {
+      "type": "string",
+      "description": "Street address line 1"
+    },
+    "street2": {
+      "type": ["string", "null"],
+      "description": "Street address line 2 (apartment, suite, etc.)"
+    },
+    "city": {
+      "type": "string",
+      "description": "City or town"
+    },
+    "postal_code": {
+      "type": "string",
+      "description": "Postal or ZIP code"
+    },
+    "region": {
+      "type": ["string", "null"],
+      "description": "State, province, or region"
+    },
+    "country": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code",
+      "pattern": "^[A-Z]{2}$",
+      "default": "FR"
+    }
+  },
+  "required": ["street", "city", "postal_code", "country"]
+}

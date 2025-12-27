@@ -1,0 +1,13 @@
+{
+  "id": "1f2a3b4c-5d6e-4f7a-8b9c-0d1e2f3a4b5c",
+  "order_id": "8e9f0a1b-2c3d-4e5f-6a7b-8c9d0e1f2a3b",
+  "product_id": "4b5c6d7e-8f9a-4b0c-1d2e-3f4a5b6c7d8e",
+  "product_name": "Guide pratique du Faire ensemble",
+  "product_sku": "BOOK-FDFP-2025",
+  "variant_id": "format_papier",
+  "quantity": 2,
+  "unit_price": 35.00,
+  "line_total": 70.00,
+  "tenant_id": "1er-Degré",
+  "created_at": "2025-10-15T16:45:00Z"
+}

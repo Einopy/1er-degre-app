@@ -1,0 +1,27 @@
+{
+  "id": "4b5c6d7e-8f9a-4b0c-1d2e-3f4a5b6c7d8e",
+  "sku": "BOOK-FDFP-2025",
+  "name": "Guide pratique du Faire ensemble",
+  "description": "Manuel complet pour animer des ateliers collaboratifs. 250 pages avec exercices pratiques, études de cas et fiches outils détachables.",
+  "price": 35.00,
+  "category": "Livres",
+  "weight_grams": 450,
+  "inventory_quantity": 127,
+  "is_active": true,
+  "image_url": "https://cdn.1er-degre.fr/products/guide-fdfp-2025.jpg",
+  "variants": [
+    {
+      "variant_id": "format_papier",
+      "name": "Format papier",
+      "price_modifier": 0.00
+    },
+    {
+      "variant_id": "format_numerique",
+      "name": "Format numérique PDF",
+      "price_modifier": -15.00
+    }
+  ],
+  "tenant_id": "1er-Degré",
+  "created_at": "2025-01-05T10:00:00Z",
+  "updated_at": "2025-10-08T14:30:00Z"
+}

@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1er-degre.fr/schemas/product.json",
+  "title": "Product",
+  "description": "Physical or digital product available for purchase",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique product identifier",
+      "readOnly": true
+    },
+    "sku": {
+      "type": "string",
+      "description": "Stock keeping unit - unique product code"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Product name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed product description"
+    },
+    "price": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Product price in euros"
+    },
+    "category": {
+      "type": ["string", "null"],
+      "description": "Product category for organization"
+    },
+    "weight_grams": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Product weight in grams for shipping calculation"
+    },
+    "inventory_quantity": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Available stock quantity"
+    },
+    "is_active": {
+      "type": "boolean",
+      "description": "Whether product is available for purchase",
+      "default": true
+    },
+    "image_url": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "Product image URL"
+    },
+    "variants": {
+      "type": "array",
+      "description": "Product variants (size, color, etc.)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "variant_id": {
+            "type": "string",
+            "description": "Variant identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Variant name"
+          },
+          "price_modifier": {
+            "type": "number",
+            "description": "Price adjustment for this variant"
+          }
+        },
+        "required": ["variant_id", "name"]
+      },
+      "default": []
+    },
+    "tenant_id": {
+      "type": "string",
+      "description": "Tenant identifier for multi-tenant isolation",
+      "default": "1er-Degré"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Product creation timestamp",
+      "readOnly": true
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "sku",
+    "name",
+    "description",
+    "price",
+    "inventory_quantity",
+    "is_active"
+  ]
+}

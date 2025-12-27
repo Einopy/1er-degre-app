@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1er-degre.fr/schemas/email-template.json",
+  "title": "EmailTemplate",
+  "description": "Reusable email template with merge variable support",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique template identifier",
+      "readOnly": true
+    },
+    "template_key": {
+      "type": "string",
+      "description": "Unique key for template lookup",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable template name"
+    },
+    "description": {
+      "type": ["string", "null"],
+      "description": "Template purpose and usage notes"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Email subject line with optional merge variables"
+    },
+    "body_html": {
+      "type": "string",
+      "description": "HTML email body with merge variables"
+    },
+    "body_text": {
+      "type": ["string", "null"],
+      "description": "Plain text fallback email body"
+    },
+    "variables": {
+      "type": "array",
+      "description": "List of available merge variables for this template",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Variable name used in template"
+          },
+          "description": {
+            "type": "string",
+            "description": "Variable purpose and example value"
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether this variable must be provided"
+          }
+        },
+        "required": ["name", "description", "required"]
+      },
+      "default": []
+    },
+    "tenant_id": {
+      "type": "string",
+      "description": "Tenant identifier for multi-tenant isolation",
+      "default": "1er-Degré"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Template creation timestamp",
+      "readOnly": true
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "template_key",
+    "name",
+    "subject",
+    "body_html"
+  ]
+}

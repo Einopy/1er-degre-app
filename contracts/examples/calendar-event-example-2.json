@@ -1,0 +1,29 @@
+{
+  "id": "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
+  "workshop_id": "8a9b0c1d-2e3f-4a5b-6c7d-8e9f0a1b2c3d",
+  "title": "Heure Déclic - Hebdomadaire",
+  "description": "Session hebdomadaire de formation professionnelle pour enseignants. Tous les mercredis de 14h à 15h30.",
+  "start_time": "2025-12-03T14:00:00Z",
+  "end_time": "2025-12-03T15:30:00Z",
+  "all_day": false,
+  "location": null,
+  "virtual_meeting_url": "https://meet.google.com/abc-defg-hij",
+  "recurrence_rule": "FREQ=WEEKLY;BYDAY=WE;UNTIL=20260331T150000Z",
+  "participant_ids": [
+    "f7e8d9c0-b1a2-4536-9d8e-7f6a5b4c3d2e",
+    "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+    "4d5e6f7a-8b9c-4d0e-1f2a-3b4c5d6e7f8a"
+  ],
+  "organizer_ids": [
+    "f7e8d9c0-b1a2-4536-9d8e-7f6a5b4c3d2e",
+    "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
+  ],
+  "reminder_settings": {
+    "enabled": true,
+    "minutes_before": 60,
+    "method": "email"
+  },
+  "tenant_id": "1er-Degré",
+  "created_at": "2025-08-20T11:15:00Z",
+  "updated_at": "2025-10-10T09:45:00Z"
+}

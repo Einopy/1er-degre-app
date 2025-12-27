@@ -1,0 +1,19 @@
+{
+  "id": "3c4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f",
+  "tracking_number": "3c4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f",
+  "order_id": "8e9f0a1b-2c3d-4e5f-6a7b-8c9d0e1f2a3b",
+  "weight_grams": 900,
+  "weight_range_min": 0,
+  "weight_range_max": 1000,
+  "sequential_index": 42,
+  "carrier": "Colissimo",
+  "service_level": "Standard",
+  "shipping_cost": 6.50,
+  "status": "shipped",
+  "label_url": "https://storage.1er-degre.fr/labels/3c4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f.pdf",
+  "shipped_at": "2025-10-16T09:30:00Z",
+  "delivered_at": null,
+  "tenant_id": "1er-Degré",
+  "created_at": "2025-10-15T17:15:00Z",
+  "updated_at": "2025-10-16T09:30:00Z"
+}

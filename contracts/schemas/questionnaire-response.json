@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1er-degre.fr/schemas/questionnaire-response.json",
+  "title": "QuestionnaireResponse",
+  "description": "Participant's responses to a questionnaire",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique response identifier",
+      "readOnly": true
+    },
+    "questionnaire_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to questionnaire"
+    },
+    "participation_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Reference to participation if questionnaire is workshop-related"
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to responding user"
+    },
+    "answers": {
+      "type": "array",
+      "description": "List of answers to questionnaire questions",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "description": "Question identifier from questionnaire"
+          },
+          "answer": {
+            "description": "Answer value - type varies based on question type",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          }
+        },
+        "required": ["question_id", "answer"]
+      },
+      "minItems": 1
+    },
+    "completion_status": {
+      "type": "string",
+      "enum": ["in_progress", "completed", "abandoned"],
+      "description": "Response completion status"
+    },
+    "submitted_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Timestamp when response was submitted"
+    },
+    "time_spent_seconds": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Total time spent completing questionnaire in seconds"
+    },
+    "tenant_id": {
+      "type": "string",
+      "description": "Tenant identifier for multi-tenant isolation",
+      "default": "1er-Degré"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Response creation timestamp",
+      "readOnly": true
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "questionnaire_id",
+    "user_id",
+    "answers",
+    "completion_status"
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1er-degre.fr/schemas/common/enums.json",
+  "title": "Common Enumerations",
+  "description": "Shared enumeration definitions used across multiple entities",
+  "$defs": {
+    "workshop_family": {
+      "type": "string",
+      "enum": ["FDFP", "HD"],
+      "description": "Workshop family: FDFP (Formation du Faire ensemble) or HD (Heure Déclic)"
+    },
+    "workshop_type": {
+      "type": "string",
+      "enum": [
+        "formation",
+        "formation_pro_1",
+        "formation_pro_2",
+        "formation_formateur",
+        "formation_retex"
+      ],
+      "description": "Type of workshop or training session"
+    },
+    "lifecycle_status": {
+      "type": "string",
+      "enum": ["active", "closed", "canceled"],
+      "description": "Workshop lifecycle status"
+    },
+    "classification_status": {
+      "type": "string",
+      "enum": [
+        "benevole_grand_public",
+        "interne_asso",
+        "interne_entreprise",
+        "interne_profs",
+        "interne_etudiants_alumnis",
+        "interne_elus",
+        "interne_agents",
+        "externe_asso",
+        "externe_entreprise",
+        "externe_profs",
+        "externe_etudiants_alumnis",
+        "externe_elus",
+        "externe_agents"
+      ],
+      "description": "Workshop classification taxonomy for audience segmentation"
+    },
+    "participation_status": {
+      "type": "string",
+      "enum": [
+        "en_attente",
+        "inscrit",
+        "paye",
+        "rembourse",
+        "echange",
+        "annule"
+      ],
+      "description": "Participation enrollment status"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": ["none", "pending", "paid", "refunded", "failed"],
+      "description": "Payment processing status"
+    },
+    "ticket_type": {
+      "type": "string",
+      "enum": ["normal", "reduit", "gratuit", "pro"],
+      "description": "Ticket pricing category"
+    },
+    "waitlist_status": {
+      "type": "string",
+      "enum": ["waiting", "notified", "converted", "expired"],
+      "description": "Waitlist entry status"
+    },
+    "order_status": {
+      "type": "string",
+      "enum": ["pending", "processing", "completed", "cancelled", "refunded"],
+      "description": "Order fulfillment status"
+    },
+    "invoice_status": {
+      "type": "string",
+      "enum": ["draft", "issued", "paid", "overdue", "cancelled", "void"],
+      "description": "Invoice billing status"
+    },
+    "shipping_status": {
+      "type": "string",
+      "enum": ["created", "printed", "shipped", "delivered", "returned"],
+      "description": "Shipping label and delivery status"
+    },
+    "email_status": {
+      "type": "string",
+      "enum": ["scheduled", "sent", "failed"],
+      "description": "Email sending status"
+    },
+    "delivery_status": {
+      "type": "string",
+      "enum": ["queued", "sent", "delivered", "bounced", "complained", "failed"],
+      "description": "Email delivery tracking status"
+    }
+  }
+}

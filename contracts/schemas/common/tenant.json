@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1er-degre.fr/schemas/common/tenant.json",
+  "title": "Tenant Field",
+  "description": "Multi-tenant scoping field for future phase expansion",
+  "$defs": {
+    "tenant_id": {
+      "type": "string",
+      "description": "Tenant identifier for multi-tenant isolation. Phase 1 defaults to '1er-Degré'",
+      "default": "1er-Degré"
+    }
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1er-degre.fr/schemas/order.json",
+  "title": "Order",
+  "description": "Customer order containing one or more products",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique order identifier",
+      "readOnly": true
+    },
+    "order_number": {
+      "type": "string",
+      "description": "Human-readable order number",
+      "readOnly": true
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to customer"
+    },
+    "order_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Order placement timestamp"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "processing", "completed", "cancelled", "refunded"],
+      "description": "Order fulfillment status"
+    },
+    "subtotal_amount": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Sum of all line items before tax and shipping"
+    },
+    "tax_amount": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Total tax amount"
+    },
+    "shipping_amount": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Shipping cost"
+    },
+    "total_amount": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Final total including all charges"
+    },
+    "shipping_address": {
+      "type": "object",
+      "description": "Delivery address",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "street2": {
+          "type": ["string", "null"]
+        },
+        "city": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": ["string", "null"]
+        },
+        "country": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$",
+          "default": "FR"
+        }
+      },
+      "required": ["street", "city", "postal_code", "country"]
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Customer notes or special instructions"
+    },
+    "tenant_id": {
+      "type": "string",
+      "description": "Tenant identifier for multi-tenant isolation",
+      "default": "1er-Degré"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Order creation timestamp",
+      "readOnly": true
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "user_id",
+    "order_date",
+    "status",
+    "subtotal_amount",
+    "tax_amount",
+    "shipping_amount",
+    "total_amount",
+    "shipping_address"
+  ]
+}

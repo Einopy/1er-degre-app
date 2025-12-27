@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1er-degre.fr/schemas/common/references.json",
+  "title": "Reference Fields",
+  "description": "Standard ID reference patterns for entity relationships",
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID v4 identifier",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to a User entity"
+    },
+    "workshop_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to a Workshop entity"
+    },
+    "participation_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to a Participation entity"
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to an Order entity"
+    },
+    "product_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to a Product entity"
+    },
+    "company_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to a Company entity"
+    },
+    "questionnaire_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to a Questionnaire entity"
+    }
+  }
+}

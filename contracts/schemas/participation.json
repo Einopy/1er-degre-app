@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1er-degre.fr/schemas/participation.json",
+  "title": "Participation",
+  "description": "User enrollment and participation in a workshop, including payment and attendance tracking",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique participation identifier",
+      "readOnly": true
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to participating user"
+    },
+    "workshop_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to workshop"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "en_attente",
+        "inscrit",
+        "paye",
+        "rembourse",
+        "echange",
+        "annule"
+      ],
+      "description": "Participation enrollment status"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": ["none", "pending", "paid", "refunded", "failed"],
+      "description": "Payment processing status"
+    },
+    "ticket_type": {
+      "type": "string",
+      "enum": ["normal", "reduit", "gratuit", "pro"],
+      "description": "Ticket pricing category"
+    },
+    "price_paid": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Actual amount paid in euros"
+    },
+    "can_refund": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "Server-computed: true if now ≤ start_at − 72h, or if date/location changed after purchase"
+    },
+    "exchange_parent_participation_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Reference to original participation if this is an exchange"
+    },
+    "invoice_url": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "readOnly": true,
+      "description": "Invoice download URL - visible to the payor only (access rule, not validation)"
+    },
+    "confirmation_date": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Timestamp when enrollment was confirmed"
+    },
+    "mail_disabled": {
+      "type": "boolean",
+      "description": "Whether participant has opted out of email communications",
+      "default": false
+    },
+    "training_completion": {
+      "type": ["object", "null"],
+      "description": "Training completion tracking",
+      "properties": {
+        "completed": {
+          "type": "boolean",
+          "description": "Whether training was completed"
+        },
+        "completion_date": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Date training was marked complete"
+        },
+        "certificate_url": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "description": "Link to completion certificate if applicable"
+        }
+      },
+      "required": ["completed"]
+    },
+    "attended": {
+      "type": ["boolean", "null"],
+      "description": "Whether participant attended the workshop"
+    },
+    "questionnaire_response_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Reference to post-workshop questionnaire response"
+    },
+    "tenant_id": {
+      "type": "string",
+      "description": "Tenant identifier for multi-tenant isolation",
+      "default": "1er-Degré"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Participation creation timestamp",
+      "readOnly": true
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "user_id",
+    "workshop_id",
+    "status",
+    "payment_status",
+    "ticket_type",
+    "price_paid"
+  ]
+}

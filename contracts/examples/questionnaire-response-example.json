@@ -1,0 +1,38 @@
+{
+  "id": "9e8f7d6c-5b4a-3c2d-1e0f-9a8b7c6d5e4f",
+  "questionnaire_id": "7e8f9a0b-1c2d-4e3f-4a5b-6c7d8e9f0a1b",
+  "participation_id": "5c6d7e8f-9a0b-4c1d-2e3f-4a5b6c7d8e9f",
+  "user_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+  "answers": [
+    {
+      "question_id": "q1",
+      "answer": 5
+    },
+    {
+      "question_id": "q2",
+      "answer": true
+    },
+    {
+      "question_id": "q3",
+      "answer": [
+        "La qualité de l'animation",
+        "Les exercices pratiques",
+        "Les échanges avec le groupe"
+      ]
+    },
+    {
+      "question_id": "q4",
+      "answer": "Excellente formation ! J'aurais aimé avoir plus de temps pour les exercices de mise en pratique. Peut-être prévoir une journée supplémentaire ou des sessions de suivi."
+    },
+    {
+      "question_id": "q5",
+      "answer": 9
+    }
+  ],
+  "completion_status": "completed",
+  "submitted_at": "2025-11-16T10:30:00Z",
+  "time_spent_seconds": 420,
+  "tenant_id": "1er-Degré",
+  "created_at": "2025-11-16T10:23:00Z",
+  "updated_at": "2025-11-16T10:30:00Z"
+}

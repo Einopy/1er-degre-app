@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://1er-degre.fr/schemas/order-item.json",
+  "title": "OrderItem",
+  "description": "Individual line item within an order",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique order item identifier",
+      "readOnly": true
+    },
+    "order_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to parent order"
+    },
+    "product_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to product"
+    },
+    "product_name": {
+      "type": "string",
+      "description": "Product name snapshot at order time"
+    },
+    "product_sku": {
+      "type": "string",
+      "description": "Product SKU snapshot at order time"
+    },
+    "variant_id": {
+      "type": ["string", "null"],
+      "description": "Product variant if applicable"
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Quantity ordered"
+    },
+    "unit_price": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Price per unit at order time"
+    },
+    "line_total": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Total for this line item (quantity × unit_price)"
+    },
+    "tenant_id": {
+      "type": "string",
+      "description": "Tenant identifier for multi-tenant isolation",
+      "default": "1er-Degré"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Order item creation timestamp",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "order_id",
+    "product_id",
+    "product_name",
+    "product_sku",
+    "quantity",
+    "unit_price",
+    "line_total"
+  ]
+}
