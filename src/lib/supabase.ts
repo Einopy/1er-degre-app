@@ -8,4 +8,5 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
+// Simple client - Supabase handles session persistence by default
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);

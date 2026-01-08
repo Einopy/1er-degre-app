@@ -95,7 +95,6 @@ export interface Database {
           consent_transactional: boolean
           consent_marketing: boolean
           consent_updated_at: string | null
-          authenticated: boolean
           password_hash: string | null
           auth_user_id: string | null
           tenant_id: string
@@ -123,7 +122,6 @@ export interface Database {
           consent_transactional?: boolean
           consent_marketing?: boolean
           consent_updated_at?: string | null
-          authenticated?: boolean
           password_hash?: string | null
           auth_user_id?: string | null
           tenant_id?: string
@@ -151,7 +149,6 @@ export interface Database {
           consent_transactional?: boolean
           consent_marketing?: boolean
           consent_updated_at?: string | null
-          authenticated?: boolean
           password_hash?: string | null
           auth_user_id?: string | null
           tenant_id?: string

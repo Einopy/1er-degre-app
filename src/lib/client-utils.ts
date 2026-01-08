@@ -462,7 +462,6 @@ export async function createUserWithAdmin(
         first_name: firstName,
         last_name: lastName,
         roles: ['admin'],
-        authenticated: false,
         consent_transactional: true,
         consent_marketing: false,
         status_labels: [],

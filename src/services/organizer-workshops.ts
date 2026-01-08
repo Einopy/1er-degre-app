@@ -857,7 +857,6 @@ export async function getOrCreateUser(
       last_name: lastName.trim(),
       roles: [],
       status_labels: [],
-      authenticated: false,
     })
     .select('id')
     .single();

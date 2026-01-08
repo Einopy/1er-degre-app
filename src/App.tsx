@@ -30,16 +30,15 @@ import { Toaster } from './components/ui/toaster';
 import { Toaster as Sonner } from './components/ui/sonner';
 
 function LoginRedirect() {
-  const { profile, loading } = useAuth();
+  const { profile } = useAuth();
 
-  if (loading) {
-    return null;
-  }
-
+  // Si l'utilisateur est déjà connecté, rediriger vers /home
   if (profile) {
     return <Navigate to="/home" replace />;
   }
 
+  // Toujours afficher la page Login - elle gère son propre état
+  // Ne pas retourner null pendant le loading pour éviter l'écran blanc
   return <Login />;
 }
 

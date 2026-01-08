@@ -80,7 +80,7 @@ export function Login() {
 
     try {
       const updatedUser = await createPassword(currentUser.id, password);
-      signIn(updatedUser);
+      await signIn(updatedUser);
       navigate('/home');
     } catch (err) {
       console.error('Error creating password:', err);
@@ -104,7 +104,7 @@ export function Login() {
         return;
       }
 
-      signIn(user);
+      await signIn(user);
       navigate('/home');
     } catch (err) {
       console.error('Error logging in:', err);
