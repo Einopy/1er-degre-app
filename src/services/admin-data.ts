@@ -8,6 +8,7 @@ import type {
   WorkshopHistoryLog,
 } from '@/lib/database.types';
 import { normalizeTextForSearch } from '@/lib/utils';
+import { USER_COLUMNS_COMPACT } from '@/lib/user-columns';
 
 export interface AdminDashboardStats {
   completedWorkshops: number;
@@ -577,7 +578,7 @@ export async function fetchAdminWorkshops(
       if (workshop.co_organizers && workshop.co_organizers.length > 0) {
         const { data: coOrgUsers } = await supabase
           .from('users')
-          .select('*')
+          .select(USER_COLUMNS_COMPACT)
           .in('id', workshop.co_organizers);
         coOrganizersUsers = coOrgUsers || [];
       }
@@ -633,7 +634,30 @@ export async function fetchWorkshopParticipants(
 ): Promise<ParticipantWithUser[]> {
   const { data, error } = await supabase
     .from('participations')
-    .select('*, user:users(*)')
+    .select(`
+      *,
+      user:users(
+        id,
+        auth_user_id,
+        email,
+        first_name,
+        last_name,
+        phone,
+        birthdate,
+        language_animation,
+        language_animation_codes,
+        outside_animation,
+        signed_contract,
+        signed_contract_year,
+        stripe_customer_id,
+        billing_address,
+        shipping_address,
+        status_labels,
+        is_super_admin,
+        consent_transactional,
+        consent_marketing
+      )
+    `)
     .eq('workshop_id', workshopId)
     .order('created_at', { ascending: false });
 
@@ -779,7 +803,7 @@ export async function fetchOrganizers(
   // 2) Récupérer les utilisateurs concernés
   const { data: users, error: usersError } = await supabase
     .from('users')
-    .select('*')
+    .select(USER_COLUMNS_COMPACT)
     .in('id', organizerUserIds)
     .order('created_at', { ascending: false });
 
@@ -922,7 +946,7 @@ export async function fetchOrganizers(
 export async function fetchUsersWithStats(): Promise<UserWithStats[]> {
   const { data: users, error } = await supabase
     .from('users')
-    .select('*')
+    .select(USER_COLUMNS_COMPACT)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -969,7 +993,7 @@ export async function fetchParticipants(): Promise<ParticipantStats[]> {
   // Fetch all users
   const { data: users, error } = await supabase
     .from('users')
-    .select('*')
+    .select(USER_COLUMNS_COMPACT)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -1063,7 +1087,7 @@ export async function fetchWaitlistEntries(): Promise<WaitlistWithWorkshop[]> {
       const userData = entry.user_id
         ? await supabase
             .from('users')
-            .select('*')
+            .select(USER_COLUMNS_COMPACT)
             .eq('id', entry.user_id)
             .maybeSingle()
         : { data: null };
@@ -1169,7 +1193,7 @@ export async function fetchActiveWorkshops(
       if (workshop.co_organizers && workshop.co_organizers.length > 0) {
         const { data: coOrgUsers } = await supabase
           .from('users')
-          .select('*')
+          .select(USER_COLUMNS_COMPACT)
           .in('id', workshop.co_organizers);
         co_organizers_users = coOrgUsers || [];
       }
@@ -1253,7 +1277,7 @@ export async function fetchRecentCompletedWorkshops(
       if (workshop.co_organizers && workshop.co_organizers.length > 0) {
         const { data: coOrgUsers } = await supabase
           .from('users')
-          .select('*')
+          .select(USER_COLUMNS_COMPACT)
           .in('id', workshop.co_organizers);
         co_organizers_users = coOrgUsers || [];
       }
@@ -1287,7 +1311,7 @@ export async function fetchRecentParticipants(
       workshop_id,
       created_at,
       status,
-      user:users(*),
+      user:users(id, email, first_name, last_name, phone, is_super_admin),
       workshop:workshops(title, workshop_family_id)
     `
     )
@@ -1335,7 +1359,7 @@ export async function fetchRecentOrganizers(
     .select(
       `
       granted_at,
-      user:users(*),
+      user:users(id, email, first_name, last_name, phone, is_super_admin),
       role_level:role_levels(
         internal_key,
         workshop_family:workshop_families(code)

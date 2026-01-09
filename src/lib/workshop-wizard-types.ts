@@ -19,7 +19,7 @@ export interface WorkshopWizardData {
   enablePostWorkshopEmails?: boolean;
 }
 
-export type WizardStep = 'workshop-family' | 'event-type-language' | 'classification-coorg' | 'details' | 'schedule' | 'location' | 'review';
+export type WizardStep = 'family-type-language' | 'classification-coorg' | 'details' | 'schedule' | 'location' | 'review';
 
 export interface WizardStepConfig {
   id: WizardStep;
@@ -28,8 +28,7 @@ export interface WizardStepConfig {
 }
 
 export const WIZARD_STEPS: WizardStepConfig[] = [
-  { id: 'workshop-family', label: 'Fresques disponibles', description: 'Sélection de la fresque' },
-  { id: 'event-type-language', label: 'Type et langue de l\'évènement', description: 'Configuration de l\'évènement' },
+  { id: 'family-type-language', label: 'Fresque et type', description: 'Sélection de la fresque, type et langue' },
   { id: 'classification-coorg', label: 'Classification et co-organisateurs', description: 'Audience et équipe' },
   { id: 'details', label: 'Détails de l\'évènement', description: 'Titre, description et capacité' },
   { id: 'schedule', label: 'Planification', description: 'Date, heure et durée' },

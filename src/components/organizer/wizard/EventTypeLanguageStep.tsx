@@ -6,20 +6,20 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Users, GraduationCap, CheckCircle, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { WorkshopWizardData } from '@/lib/workshop-wizard-types';
-import type { User as UserType, WorkshopFamily, WorkshopType } from '@/lib/database.types';
-import { hasRole } from '@/lib/organizer-utils';
+import type { WorkshopFamily, WorkshopType } from '@/lib/database.types';
+import { useAuth } from '@/contexts/AuthContext';
 import { LanguageSelectorCSS as LanguageSelector } from './LanguageSelectorCSS';
 
 interface EventTypeLanguageStepProps {
   form: UseFormReturn<WorkshopWizardData>;
-  user: UserType;
   validationError?: string;
   families?: WorkshopFamily[];
   workshopTypes?: WorkshopType[];
 }
 
-export function EventTypeLanguageStep({ form, user, validationError, families, workshopTypes }: EventTypeLanguageStepProps) {
+export function EventTypeLanguageStep({ form, validationError, families, workshopTypes }: EventTypeLanguageStepProps) {
   const { watch, setValue } = form;
+  const { permissions } = useAuth();
   const workshopFamilyId = watch('workshop_family_id');
   const workshopTypeId = watch('workshop_type_id');
   const languageCode = watch('language_code');
@@ -39,6 +39,16 @@ export function EventTypeLanguageStep({ form, user, validationError, families, w
 
   const selectedType = availableTypes.find(t => t.id === workshopTypeId);
 
+  // Helper pour obtenir le niveau max de l'utilisateur pour une famille
+  const getUserMaxLevelForFamily = (familyId: string): number => {
+    const levels = (permissions?.roleLevels || [])
+      .filter(rl => rl.role_level?.workshop_family_id === familyId)
+      .map(rl => rl.role_level?.level || 0);
+    return levels.length > 0 ? Math.max(...levels) : 0;
+  };
+
+  const userMaxLevel = workshopFamilyId ? getUserMaxLevelForFamily(workshopFamilyId) : 0;
+
   useEffect(() => {
     if (selectedType && !selectedType.is_formation) {
       setPrimaryTypeSelection('workshop');
@@ -49,19 +59,21 @@ export function EventTypeLanguageStep({ form, user, validationError, families, w
     }
   }, [selectedType]);
 
-  const hasTrainerPermission = () => {
-    if (!familyCode) return false;
-    return hasRole(user, `${familyCode}_trainer`) || hasRole(user, `${familyCode}_instructor`);
+  // Niveau 3 = trainer, Niveau 4 = instructor
+  const hasTrainerPermission = (): boolean => {
+    return userMaxLevel >= 3;
   };
 
   const getAvailableFormationTypes = () => {
     if (!familyCode) return [];
 
     return formationTypes.filter((type) => {
+      // Les formations pro_1, pro_2, formateur nécessitent niveau 4 (instructor)
       if (type.code.includes('pro_1') || type.code.includes('pro_2') || type.code.includes('formateur')) {
-        return hasRole(user, `${familyCode}_instructor`);
+        return userMaxLevel >= 4;
       }
-      return hasRole(user, `${familyCode}_trainer`) || hasRole(user, `${familyCode}_instructor`);
+      // Les autres formations nécessitent niveau 3+ (trainer ou instructor)
+      return userMaxLevel >= 3;
     });
   };
 

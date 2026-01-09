@@ -3,6 +3,7 @@ import type { User } from '@/lib/database.types';
 import { signOut as authSignOut } from '@/services/auth';
 import { getUserPermissions, type UserPermissions } from '@/services/user-permissions';
 import { supabase } from '@/lib/supabase';
+import { USER_COLUMNS_COMPACT } from '@/lib/user-columns';
 
 // ============================================================================
 // GLOBAL STATE - Persists across component remounts
@@ -31,7 +32,7 @@ async function initializeAuth(): Promise<{ profile: User | null; permissions: Us
   // Get user profile from public.users table
   const { data: userData } = await supabase
     .from('users')
-    .select('*')
+    .select(USER_COLUMNS_COMPACT)
     .eq('auth_user_id', session.user.id)
     .maybeSingle();
 
@@ -116,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // If we don't have a profile but got a token refresh, try to load it
         const { data: userData } = await supabase
           .from('users')
-          .select('*')
+          .select(USER_COLUMNS_COMPACT)
           .eq('auth_user_id', session.user.id)
           .maybeSingle();
         
@@ -171,7 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data: userData } = await supabase
       .from('users')
-      .select('*')
+      .select(USER_COLUMNS_COMPACT)
       .eq('auth_user_id', session.user.id)
       .maybeSingle();
 

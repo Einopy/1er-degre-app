@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import type { User } from '@/lib/database.types';
 import { type WorkshopFamily } from '@/lib/organizer-utils';
+import { USER_COLUMNS_COMPACT } from '@/lib/user-columns';
 
 export interface CoOrganizerAlert {
   id: string;
@@ -27,7 +28,7 @@ export async function fetchEligibleCoOrganizers(
   // Fetch all users
   const { data: users, error } = await supabase
     .from('users')
-    .select('*')
+    .select(USER_COLUMNS_COMPACT)
     .neq('id', excludeUserId)
     .order('first_name', { ascending: true });
 
@@ -102,7 +103,7 @@ export async function fetchWorkshopCoOrganizers(
   // Fetch the users
   const { data: users, error: usersError } = await supabase
     .from('users')
-    .select('*')
+    .select(USER_COLUMNS_COMPACT)
     .in('id', coOrganizerIds);
 
   if (usersError) {

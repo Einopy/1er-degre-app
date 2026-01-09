@@ -86,7 +86,6 @@ export interface Database {
           outside_animation: string | null
           signed_contract: boolean
           signed_contract_year: number | null
-          roles: string[]
           is_super_admin: boolean
           stripe_customer_id: string | null
           billing_address: Json | null
@@ -113,7 +112,6 @@ export interface Database {
           outside_animation?: string | null
           signed_contract?: boolean
           signed_contract_year?: number | null
-          roles?: string[]
           is_super_admin?: boolean
           stripe_customer_id?: string | null
           billing_address?: Json | null
@@ -140,7 +138,6 @@ export interface Database {
           outside_animation?: string | null
           signed_contract?: boolean
           signed_contract_year?: number | null
-          roles?: string[]
           is_super_admin?: boolean
           stripe_customer_id?: string | null
           billing_address?: Json | null

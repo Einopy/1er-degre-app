@@ -326,7 +326,7 @@ export function ParticipantsTab({
                               onClick={() =>
                                 setSelectedAction({ type: 'remove', participant })
                               }
-                              className="py-3 cursor-pointer bg-red-50 hover:bg-red-100 focus:bg-red-100 text-destructive font-medium"
+                              className="py-3 cursor-pointer bg-red-50 hover:bg-red-100 focus:bg-red-100 text-destructive hover:text-destructive focus:text-destructive font-medium"
                             >
                               Retirer
                             </DropdownMenuItem>

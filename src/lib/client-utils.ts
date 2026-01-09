@@ -1,5 +1,6 @@
 import type { User, Client, ClientAdmin } from './database.types';
 import { supabase } from './supabase';
+import { USER_COLUMNS_COMPACT } from './user-columns';
 
 export async function getAdminClientIds(user: User | null): Promise<string[]> {
   if (!user) return [];
@@ -111,7 +112,30 @@ export async function getClientAdmins(clientId: string): Promise<(ClientAdmin & 
   try {
     const { data, error } = await (supabase
       .from('client_admins') as any)
-      .select('*, user:users(*)')
+      .select(`
+        *,
+        user:users(
+          id,
+          auth_user_id,
+          email,
+          first_name,
+          last_name,
+          phone,
+          birthdate,
+          language_animation,
+          language_animation_codes,
+          outside_animation,
+          signed_contract,
+          signed_contract_year,
+          stripe_customer_id,
+          billing_address,
+          shipping_address,
+          status_labels,
+          is_super_admin,
+          consent_transactional,
+          consent_marketing
+        )
+      `)
       .eq('client_id', clientId);
 
     if (error) {
@@ -504,7 +528,7 @@ export async function searchUsersByEmail(query: string): Promise<User[]> {
   try {
     const { data, error } = await (supabase
       .from('users') as any)
-      .select('*')
+      .select(USER_COLUMNS_COMPACT)
       .ilike('email', `%${query}%`)
       .order('created_at', { ascending: false })
       .limit(20);
@@ -535,7 +559,7 @@ export async function getUsersNotAdminForClient(clientId: string, searchQuery?: 
 
     const adminUserIds = (clientAdmins || []).map((ca: any) => ca.user_id);
 
-    let query = supabase.from('users').select('*');
+    let query = supabase.from('users').select(USER_COLUMNS_COMPACT);
 
     if (adminUserIds.length > 0) {
       query = query.not('id', 'in', `(${adminUserIds.join(',')})`);

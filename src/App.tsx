@@ -14,9 +14,9 @@ import { Home } from './pages/Home';
 import { Dashboard } from './pages/Dashboard';
 import { UserProfile } from './pages/UserProfile';
 import { ProfileWorkshops } from './pages/ProfileWorkshops';
-import { MyJourney } from './pages/MyJourney';
+import { MyJourneyRouter } from './pages/MyJourneyRouter';
+import { MyJourneyPage } from './pages/MyJourneyPage';
 import { Accounting } from './pages/Accounting';
-import { Formation } from './pages/Formation';
 import { ResourcesFDFP } from './pages/ResourcesFDFP';
 import { ResourcesHD } from './pages/ResourcesHD';
 import { Shop } from './pages/Shop';
@@ -75,9 +75,12 @@ function AppContent() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/profile/workshops" element={<ProfileWorkshops />} />
-            <Route path="/my-journey" element={<MyJourney />} />
+            <Route path="/parcours" element={<MyJourneyRouter />} />
+            <Route path="/parcours/:familyCode" element={<MyJourneyPage />} />
             <Route path="/accounting" element={<Accounting />} />
-            <Route path="/formation/:familyCode" element={<Formation />} />
+            {/* Legacy routes - redirect to new parcours */}
+            <Route path="/my-journey" element={<MyJourneyRouter />} />
+            <Route path="/formation/:familyCode" element={<MyJourneyRouter />} />
             <Route path="/app/parcours/fdfp" element={<FormationRedirectFDFP />} />
             <Route path="/app/parcours/hd" element={<FormationRedirectHD />} />
             <Route path="/resources/fdfp" element={<ResourcesFDFP />} />

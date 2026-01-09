@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { USER_COLUMNS_COMPACT } from '@/lib/user-columns';
 import type { User } from '@/lib/database.types';
 
 export interface EmailCheckResult {
@@ -18,7 +19,7 @@ export async function checkEmail(email: string): Promise<EmailCheckResult> {
   const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
   
   const response = await fetch(
-    `${supabaseUrl}/rest/v1/users?email=eq.${encodeURIComponent(normalizedEmail)}&select=*`,
+    `${supabaseUrl}/rest/v1/users?email=eq.${encodeURIComponent(normalizedEmail)}&select=id,auth_user_id,email,first_name,last_name,phone,birthdate,is_super_admin,consent_transactional,consent_marketing`,
     {
       headers: {
         'apikey': supabaseKey,
@@ -52,7 +53,7 @@ export async function createPassword(userId: string, password: string): Promise<
   // Get user data
   const { data: userData, error: userError } = await supabase
     .from('users')
-    .select('*')
+    .select(USER_COLUMNS_COMPACT)
     .eq('id', userId)
     .maybeSingle();
 
@@ -106,7 +107,7 @@ export async function signIn(email: string, password: string): Promise<User | nu
 
   const { data: user } = await supabase
     .from('users')
-    .select('*')
+    .select(USER_COLUMNS_COMPACT)
     .eq('auth_user_id', authData.user.id)
     .maybeSingle();
 
@@ -126,7 +127,7 @@ export async function signOut(): Promise<void> {
 export async function getUserByAuthId(authUserId: string): Promise<User | null> {
   const { data } = await supabase
     .from('users')
-    .select('*')
+    .select(USER_COLUMNS_COMPACT)
     .eq('auth_user_id', authUserId)
     .maybeSingle();
 

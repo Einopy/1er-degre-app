@@ -12,7 +12,6 @@ import {
   ExternalLink,
   Clock,
   Users,
-  Globe,
   Edit,
   Save,
   X,
@@ -31,6 +30,8 @@ import { updateWorkshopAsOrganizer } from '@/services/organizer-workshops';
 import { useToast } from '@/hooks/use-toast';
 import { LocationFieldsGroup } from './LocationFieldsGroup';
 import { LanguageSelectorCSS } from './wizard/LanguageSelectorCSS';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import 'flag-icons/css/flag-icons.min.css';
 
 interface WorkshopInfoCardProps {
   workshop: Workshop;
@@ -55,6 +56,41 @@ export function WorkshopInfoCard({
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const isMainOrganizer = currentUserId === workshop.organizer;
+
+  // Helper functions for badges
+  const getWorkshopTypeLabel = (type: string): string => {
+    const parts = type.split('_');
+    const suffix = parts.length > 1 ? parts[parts.length - 1] : type;
+
+    const typeMap: Record<string, string> = {
+      'workshop': 'Atelier',
+      'formation': 'Formation',
+      'pro': 'Formation Pro',
+      'formateur': 'Formation Formateur',
+      'retex': 'Formation Retex',
+    };
+    return typeMap[suffix] || type;
+  };
+
+  const getLanguageFlagCode = (language: string): string => {
+    const flagMap: Record<string, string> = {
+      'fr': 'fr',
+      'en': 'gb',
+      'de': 'de',
+      'zh': 'cn',
+    };
+    return flagMap[language.toLowerCase()] || 'fr';
+  };
+
+  // Get workshop family code
+  const workshopFamilyCode = (workshop as any).workshop_family
+    ? (workshop as any).workshop_family.code || (workshop as any).workshop_family.name
+    : 'Non défini';
+
+  // Get workshop type label
+  const workshopTypeLabel = (workshop as any).workshop_type
+    ? getWorkshopTypeLabel((workshop as any).workshop_type.code || workshop.workshop_type_id)
+    : getWorkshopTypeLabel(workshop.workshop_type_id);
 
   const [editData, setEditData] = useState({
     title: workshop.title,
@@ -443,29 +479,43 @@ export function WorkshopInfoCard({
   return (
     <Card>
       <CardHeader className="pb-4 space-y-2.5 px-6 pt-6">
-        <div className="flex flex-wrap gap-1.5">
-          <Badge variant="secondary" className="text-xs">
-            Atelier
+        <div className="flex items-center gap-2 flex-wrap">
+          <Badge variant="outline" className="flex-shrink-0 px-2.5 py-1">
+            {workshopFamilyCode}
           </Badge>
-          <Badge variant="outline" className="text-xs">
-            <Globe className="h-3 w-3 mr-1" />
-            {workshop.language.toUpperCase()}
+          <Badge variant="outline" className="flex-shrink-0 px-2.5 py-1">
+            {workshopTypeLabel}
           </Badge>
-          <Badge variant="outline" className="text-xs">
-            {workshop.is_remote ? (
-              <><Monitor className="h-3 w-3 mr-1" />Distanciel</>
-            ) : (
-              <><MapPin className="h-3 w-3 mr-1" />Présentiel</>
-            )}
-          </Badge>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="relative h-5 w-5 rounded-full overflow-hidden cursor-help hover:scale-110 transition-transform flex-shrink-0 border border-border">
+                  <span
+                    className={`fi fi-${getLanguageFlagCode(workshop.language)} absolute`}
+                    style={{
+                      width: '150%',
+                      height: '150%',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)'
+                    }}
+                    aria-hidden="true"
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p>Langue: {workshop.language}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           {workshop.lifecycle_status === 'canceled' && (
-            <Badge variant="destructive" className="gap-1.5 text-xs">
+            <Badge variant="destructive" className="gap-1.5">
               <XCircle className="h-3.5 w-3.5" />
               Annulé
             </Badge>
           )}
           {workshop.lifecycle_status === 'closed' && (
-            <Badge variant="secondary" className="gap-1.5 text-xs">
+            <Badge variant="secondary" className="gap-1.5">
               <CheckCircle className="h-3.5 w-3.5" />
               Clôturé
             </Badge>

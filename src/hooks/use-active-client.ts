@@ -17,7 +17,7 @@ export function useActiveClient() {
 
   useEffect(() => {
     loadClients();
-  }, [profile?.id]);
+  }, [profile?.id, permissions?.isSuperAdmin, permissions?.isAdmin]);
 
   const loadClients = async () => {
     setLoading(true);

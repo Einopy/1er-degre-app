@@ -27,8 +27,16 @@ export interface ParticipantWithUser extends Participation {
 export async function fetchOrganizerWorkshops(
   organizerId: string
 ): Promise<OrganizerWorkshopSummary[]> {
+  // First, get workshop IDs where user is co-organizer
+  const { data: coOrgWorkshops } = await supabase
+    .from('workshop_co_organizers')
+    .select('workshop_id')
+    .eq('user_id', organizerId);
+  
+  const coOrgWorkshopIds = (coOrgWorkshops || []).map(w => w.workshop_id);
+
   // Fetch all workshops where user is either organizer or co-organizer
-  const { data: allWorkshops, error } = await supabase
+  let query = supabase
     .from('workshops')
     .select(
       `
@@ -50,8 +58,16 @@ export async function fetchOrganizerWorkshops(
       )
     `
     )
-    .or(`organizer.eq.${organizerId},co_organizers.cs.{${organizerId}}`)
     .order('start_at', { ascending: false });
+
+  // Filter by organizer OR co-organizer
+  if (coOrgWorkshopIds.length > 0) {
+    query = query.or(`organizer.eq.${organizerId},id.in.(${coOrgWorkshopIds.join(',')})`);
+  } else {
+    query = query.eq('organizer', organizerId);
+  }
+
+  const { data: allWorkshops, error } = await query;
 
   if (error) throw error;
 
@@ -68,14 +84,17 @@ export async function fetchOrganizerWorkshops(
       .reduce((sum: number, p: any) => sum + parseFloat(p.price_paid || 0), 0);
     const remaining_seats = workshop.audience_number - participant_count;
 
-    // Fetch co-organizers user data
+    // Fetch co-organizers user data from workshop_co_organizers table
     let coOrganizersUsers: User[] = [];
-    if (workshop.co_organizers && workshop.co_organizers.length > 0) {
-      const { data: coOrgUsers } = await supabase
-        .from('users')
-        .select('*')
-        .in('id', workshop.co_organizers);
-      coOrganizersUsers = coOrgUsers || [];
+    const { data: coOrgData } = await supabase
+      .from('workshop_co_organizers')
+      .select('user:users(id, email, first_name, last_name, phone, is_super_admin)')
+      .eq('workshop_id', workshop.id);
+    
+    if (coOrgData && coOrgData.length > 0) {
+      coOrganizersUsers = coOrgData
+        .map((co: any) => co.user)
+        .filter((u: any): u is User => u !== null);
     }
 
     return {
@@ -296,10 +315,21 @@ export async function createPlannedWorkshop(
     modified_location_flag: false,
   }, organizerId);
 
+  // Get organizer name for history log
+  const { data: organizerData } = await supabase
+    .from('users')
+    .select('first_name, last_name')
+    .eq('id', organizerId)
+    .single();
+
+  const organizerName = organizerData 
+    ? `${organizerData.first_name} ${organizerData.last_name}`
+    : 'Organisateur';
+
   await logHistoryEvent(
     workshop.id,
     'status_change',
-    'Atelier créé',
+    `${organizerName} a créé l'atelier`,
     {
       workshop_family_id: workshop.workshop_family_id,
       workshop_type_id: workshop.workshop_type_id,
@@ -572,7 +602,7 @@ export async function addParticipant(
 ): Promise<Participation> {
   const { data: workshop, error: workshopError } = await supabase
     .from('workshops')
-    .select('audience_number, participations(status)')
+    .select('audience_number, client_id, participations(status)')
     .eq('id', workshopId)
     .maybeSingle();
 
@@ -597,6 +627,7 @@ export async function addParticipant(
     .insert({
       workshop_id: workshopId,
       user_id: userId,
+      client_id: workshopData.client_id,
       status,
       payment_status: paymentStatus,
       ticket_type: ticketType,
@@ -855,7 +886,6 @@ export async function getOrCreateUser(
       email: normalizedEmail,
       first_name: firstName.trim(),
       last_name: lastName.trim(),
-      roles: [],
       status_labels: [],
     })
     .select('id')
@@ -899,10 +929,22 @@ export async function reinscribeParticipant(
   if (error) throw error;
 
   const participantUserId = partData.user_id;
+  
+  // Get actor name for history log
+  const { data: actorData } = await supabase
+    .from('users')
+    .select('first_name, last_name')
+    .eq('id', userId)
+    .single();
+
+  const actorName = actorData 
+    ? `${actorData.first_name} ${actorData.last_name}`
+    : 'Organisateur';
+
   await logHistoryEvent(
     workshopId,
     'participant_reinscribe',
-    `${partData.user.first_name} ${partData.user.last_name} ré-inscrit à l'atelier`,
+    `${actorName} a réinscrit à l'atelier : ${partData.user.first_name} ${partData.user.last_name}`,
     {
       participation_id: participationId,
       user_email: partData.user.email,

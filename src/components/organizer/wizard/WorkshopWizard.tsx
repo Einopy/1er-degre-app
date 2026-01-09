@@ -10,8 +10,7 @@ import { useActiveClient } from '@/hooks/use-active-client';
 import { useWorkshopFamilies, useWorkshopTypes } from '@/hooks/use-client-config';
 import type { WorkshopWizardData, WizardStep } from '@/lib/workshop-wizard-types';
 import { WIZARD_STEPS } from '@/lib/workshop-wizard-types';
-import { WorkshopFamilyStep } from './WorkshopFamilyStep';
-import { EventTypeLanguageStep } from './EventTypeLanguageStep';
+import { FamilyTypeLanguageStep } from './FamilyTypeLanguageStep';
 import { ClassificationCoOrgStep } from './ClassificationCoOrgStep';
 import { DetailsStep } from './DetailsStep';
 import { ScheduleStep } from './ScheduleStep';
@@ -40,7 +39,6 @@ export function WorkshopWizard({ open, onOpenChange, isPastWorkshop = false }: W
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string>('');
-  const [workshopImagePath, setWorkshopImagePath] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -81,21 +79,25 @@ export function WorkshopWizard({ open, onOpenChange, isPastWorkshop = false }: W
 
   const currentStep = WIZARD_STEPS[currentStepIndex];
 
+  // Détecter si c'est une formation pour sauter l'étape classification
+  const selectedType = (types || []).find(t => t.id === form.watch('workshop_type_id'));
+  const isFormationType = selectedType?.is_formation || false;
+
+  // Pour les formations, définir automatiquement la classification
+  useEffect(() => {
+    if (isFormationType) {
+      form.setValue('classification_status', 'formation');
+    }
+  }, [isFormationType, form]);
+
   const validateCurrentStep = async (): Promise<boolean> => {
     const values = form.getValues();
     setValidationError('');
 
     switch (currentStep.id) {
-      case 'workshop-family':
+      case 'family-type-language':
         if (!values.workshop_family_id) {
           setValidationError('Veuillez sélectionner une fresque.');
-          return false;
-        }
-        return true;
-
-      case 'event-type-language':
-        if (!values.workshop_family_id) {
-          setValidationError('Veuillez d\'abord sélectionner une fresque.');
           return false;
         }
         if (!values.workshop_type_id) {
@@ -181,7 +183,14 @@ export function WorkshopWizard({ open, onOpenChange, isPastWorkshop = false }: W
     const isValid = await validateCurrentStep();
     if (isValid && currentStepIndex < WIZARD_STEPS.length - 1) {
       setValidationError('');
-      setCurrentStepIndex(currentStepIndex + 1);
+      let nextIndex = currentStepIndex + 1;
+      
+      // Sauter l'étape classification pour les formations
+      if (isFormationType && WIZARD_STEPS[nextIndex]?.id === 'classification-coorg') {
+        nextIndex++;
+      }
+      
+      setCurrentStepIndex(nextIndex);
       setTimeout(() => {
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollTo({
@@ -207,7 +216,14 @@ export function WorkshopWizard({ open, onOpenChange, isPastWorkshop = false }: W
   const handleBack = () => {
     if (currentStepIndex > 0) {
       setValidationError('');
-      setCurrentStepIndex(currentStepIndex - 1);
+      let prevIndex = currentStepIndex - 1;
+      
+      // Sauter l'étape classification pour les formations
+      if (isFormationType && WIZARD_STEPS[prevIndex]?.id === 'classification-coorg') {
+        prevIndex--;
+      }
+      
+      setCurrentStepIndex(prevIndex);
     }
   };
 
@@ -226,7 +242,7 @@ export function WorkshopWizard({ open, onOpenChange, isPastWorkshop = false }: W
     }
 
     console.log('=== WORKSHOP CREATION STARTED ===');
-    console.log('User profile:', { id: profile.id, email: profile.email, roles: profile.roles });
+    console.log('User profile:', { id: profile.id, email: profile.email });
 
     const isValid = await validateCurrentStep();
     if (!isValid) {
@@ -250,7 +266,12 @@ export function WorkshopWizard({ open, onOpenChange, isPastWorkshop = false }: W
         values.extra_duration_minutes
       );
 
+      if (!activeClient?.id) {
+        throw new Error('Client not found');
+      }
+
       const workshopData = {
+        client_id: activeClient.id,
         title: values.title,
         description: values.description || null,
         workshop_family_id: values.workshop_family_id,
@@ -266,7 +287,7 @@ export function WorkshopWizard({ open, onOpenChange, isPastWorkshop = false }: W
         start_at: startDateTime.toISOString(),
         end_at: endAt.toISOString(),
         extra_duration_minutes: values.extra_duration_minutes || 0,
-        card_illustration_url: workshopImagePath,
+        card_illustration_url: null,
       };
 
       console.log('Workshop data prepared:', JSON.stringify(workshopData, null, 2));
@@ -432,18 +453,9 @@ export function WorkshopWizard({ open, onOpenChange, isPastWorkshop = false }: W
             />
 
             <div className="py-4">
-              {currentStep.id === 'workshop-family' && (
-                <WorkshopFamilyStep
+              {currentStep.id === 'family-type-language' && (
+                <FamilyTypeLanguageStep
                   form={form}
-                  user={profile}
-                  validationError={validationError}
-                  families={families}
-                />
-              )}
-              {currentStep.id === 'event-type-language' && (
-                <EventTypeLanguageStep
-                  form={form}
-                  user={profile}
                   validationError={validationError}
                   families={families}
                   workshopTypes={types}
@@ -474,8 +486,6 @@ export function WorkshopWizard({ open, onOpenChange, isPastWorkshop = false }: W
                   workshopTypes={types}
                   onEditStep={handleEditStep}
                   isPastWorkshop={isPastWorkshop}
-                  workshopImagePath={workshopImagePath}
-                  onWorkshopImageChange={setWorkshopImagePath}
                 />
               )}
             </div>

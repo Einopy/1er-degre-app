@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { WorkshopFamilyButtons } from '@/components/workshops/WorkshopFamilyButtons';
 import { FilterBar, type FilterBarState } from '@/components/workshops/FilterBar';
@@ -17,7 +18,7 @@ import {
 } from '@/components/ui/pagination';
 import { fetchWorkshops, type WorkshopFilters } from '@/services/workshops';
 import type { Workshop } from '@/lib/database.types';
-import { AlertCircle, Globe } from 'lucide-react';
+import { AlertCircle, Globe, GraduationCap, X } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -25,7 +26,21 @@ const PAGE_SIZE = 12;
 
 export function PublicWorkshopsList() {
   const { profile } = useAuth();
-  const [selectedFamilies, setSelectedFamilies] = useState<('FDFP' | 'HD')[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Mode verrouillé depuis Mon Parcours
+  const lockedFamily = searchParams.get('family');
+  const lockedType = searchParams.get('type');
+  const isLocked = searchParams.get('locked') === 'true';
+
+  // Si verrouillé, forcer la famille sélectionnée
+  const [selectedFamilies, setSelectedFamilies] = useState<('FDFP' | 'HD')[]>(() => {
+    if (isLocked && lockedFamily) {
+      return [lockedFamily as 'FDFP' | 'HD'];
+    }
+    return [];
+  });
+
   const [filters, setFilters] = useState<FilterBarState>({
     city: '',
     language: '',
@@ -38,6 +53,18 @@ export function PublicWorkshopsList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showWaitlist, setShowWaitlist] = useState(false);
+
+  // Mettre à jour selectedFamilies si les params changent
+  useEffect(() => {
+    if (isLocked && lockedFamily) {
+      setSelectedFamilies([lockedFamily as 'FDFP' | 'HD']);
+    }
+  }, [isLocked, lockedFamily]);
+
+  const handleExitLockedMode = () => {
+    setSearchParams({});
+    setSelectedFamilies([]);
+  };
 
   const loadWorkshops = async () => {
     setIsLoading(true);
@@ -52,6 +79,8 @@ export function PublicWorkshopsList() {
         startDate: filters.startDate,
         endDate: filters.endDate,
         partySize: filters.partySize,
+        // En mode verrouillé formation, filtrer uniquement les formations
+        isFormation: isLocked && lockedType === 'formation' ? true : undefined,
       };
 
       const result = await fetchWorkshops(workshopFilters, currentPage, PAGE_SIZE);
@@ -138,33 +167,65 @@ export function PublicWorkshopsList() {
       <Header />
       <div className="container mx-auto px-4 py-8 md:py-12 max-w-7xl">
         <div className="space-y-8">
+          {/* Mode verrouillé - Bandeau formation */}
+          {isLocked && (
+            <Alert className="bg-primary/5 border-primary/20">
+              <GraduationCap className="h-4 w-4 text-primary" />
+              <AlertTitle className="text-primary">Mode Formation</AlertTitle>
+              <AlertDescription className="flex items-center justify-between">
+                <span>
+                  Formations {lockedFamily} disponibles pour votre niveau de certification
+                </span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleExitLockedMode}
+                  className="ml-4 shrink-0"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Quitter
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="bg-card border rounded-lg p-6 md:p-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold tracking-wide uppercase">
-                  Ateliers populaires
+                  {isLocked ? `Formations ${lockedFamily}` : 'Ateliers populaires'}
                 </h1>
                 <p className="text-muted-foreground mt-2">
-                  Découvrez nos ateliers FDFP et Heure Déclic
+                  {isLocked 
+                    ? `Inscrivez-vous à une formation pour progresser dans votre parcours ${lockedFamily}`
+                    : 'Découvrez nos ateliers FDFP et Heure Déclic'
+                  }
                 </p>
               </div>
-              <CityDropdown
-                value={filters.city}
-                onValueChange={(city) => {
-                  setFilters({ ...filters, city });
-                  setCurrentPage(1);
-                }}
-                className="w-full md:w-auto min-w-[240px]"
-              />
+              {!isLocked && (
+                <CityDropdown
+                  value={filters.city}
+                  onValueChange={(city) => {
+                    setFilters({ ...filters, city });
+                    setCurrentPage(1);
+                  }}
+                  className="w-full md:w-auto min-w-[240px]"
+                />
+              )}
             </div>
           </div>
 
-          <WorkshopFamilyButtons
-            selectedFamilies={selectedFamilies}
-            onFamilyToggle={handleFamilyToggle}
-          />
+          {/* Filtres masqués en mode verrouillé */}
+          {!isLocked && (
+            <>
+              <WorkshopFamilyButtons
+                selectedFamilies={selectedFamilies}
+                onFamilyToggle={handleFamilyToggle}
+              />
 
-          <FilterBar filters={filters} onFiltersChange={setFilters} />
+              <FilterBar filters={filters} onFiltersChange={setFilters} />
+            </>
+          )}
 
           {error && (
             <Alert variant="destructive">

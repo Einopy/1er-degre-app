@@ -74,6 +74,9 @@ export function CommunicationTabNew({
   const [hasNewOfficialVersion, setHasNewOfficialVersion] = useState(false);
 
   const isPastWorkshop = new Date(workshop.start_at) < new Date();
+  
+  // Get workshop family code from joined data
+  const workshopFamilyCode = (workshop as any)?.workshop_family?.code;
 
   const eligibleParticipants = participants.filter((p) => {
     if (isPastWorkshop) {
@@ -89,7 +92,7 @@ export function CommunicationTabNew({
     if (emailMode !== 'spontane') {
       loadTemplates();
     }
-  }, [emailMode, workshop.workshop_family_id, workshop.language]);
+  }, [emailMode, workshopFamilyCode, workshop.language]);
 
   const loadTemplates = async () => {
     if (emailMode === 'spontane') return;
@@ -97,8 +100,8 @@ export function CommunicationTabNew({
     setIsLoadingTemplate(true);
     try {
       const [official, personal] = await Promise.all([
-        fetchOfficialTemplate(workshop.workshop_family_id, workshop.language, emailMode),
-        fetchPersonalTemplate(currentUserId, workshop.workshop_family_id, workshop.language, emailMode),
+        fetchOfficialTemplate(workshopFamilyCode, workshop.language, emailMode),
+        fetchPersonalTemplate(currentUserId, workshopFamilyCode, workshop.language, emailMode),
       ]);
 
       setOfficialTemplate(official);
@@ -159,7 +162,7 @@ export function CommunicationTabNew({
     try {
       await savePersonalTemplate(
         currentUserId,
-        workshop.workshop_family_id,
+        workshopFamilyCode,
         workshop.language,
         emailMode === 'spontane' ? 'pre' : emailMode,
         subject,

@@ -9,7 +9,6 @@ import {
   fetchOfficialTemplate,
   fetchPersonalTemplate,
   savePersonalTemplate,
-  updateLastViewedOfficialVersion,
   type EmailTemplate,
 } from '@/services/email-templates';
 import { sendWorkshopEmail, prepareRecipientsFromParticipants } from '@/services/email-sending';
@@ -164,14 +163,22 @@ export function CommunicationTab({
   }, [workshop.id]);
 
   const scheduleLabel = useMemo(() => {
+    const startDate = new Date(workshop.start_at);
+    const scheduledAt = new Date(startDate.getTime() - 72 * 60 * 60 * 1000);
+    const now = new Date();
+    const diffMs = scheduledAt.getTime() - now.getTime();
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    const formatter = new Intl.DateTimeFormat('fr-FR', {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    // If we have a sent date from mail_logs, use that
     if (preEmailSentDate) {
-      const formatter = new Intl.DateTimeFormat('fr-FR', {
-        weekday: 'short',
-        day: '2-digit',
-        month: 'long',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
       const parts = formatter.formatToParts(preEmailSentDate);
       const weekday = parts.find((p) => p.type === 'weekday')?.value;
       const day = parts.find((p) => p.type === 'day')?.value;
@@ -179,78 +186,62 @@ export function CommunicationTab({
       const hour = parts.find((p) => p.type === 'hour')?.value;
       const minute = parts.find((p) => p.type === 'minute')?.value;
 
-      return `Email envoyé le ${weekday} ${day} ${month} à ${hour}:${minute}`;
+      return `Envoyé : ${weekday} ${day} ${month} à ${hour}:${minute}`;
     }
 
-    const startDate = new Date(workshop.start_at);
-    const scheduledAt = new Date(startDate.getTime() - 72 * 60 * 60 * 1000);
-    const now = new Date();
-    const diffMs = scheduledAt.getTime() - now.getTime();
-    const diffHours = diffMs / (1000 * 60 * 60);
+    // Format scheduled date
+    const parts = formatter.formatToParts(scheduledAt);
+    const weekday = parts.find((p) => p.type === 'weekday')?.value;
+    const day = parts.find((p) => p.type === 'day')?.value;
+    const month = parts.find((p) => p.type === 'month')?.value;
+    const hour = parts.find((p) => p.type === 'hour')?.value;
+    const minute = parts.find((p) => p.type === 'minute')?.value;
 
-    if (diffHours < 23 && diffHours > 0) {
+    // Scheduled date is in the past - email should have been sent
+    if (diffHours <= 0) {
+      return `Envoyé : ${weekday} ${day} ${month} à ${hour}:${minute}`;
+    }
+
+    // Less than 23 hours until send
+    if (diffHours < 23) {
       const hours = Math.floor(diffHours);
       const minutes = Math.floor((diffHours - hours) * 60);
       return `Envoi programmé dans ${hours} heure${hours > 1 ? 's' : ''} et ${minutes} minute${minutes > 1 ? 's' : ''}`;
-    } else if (diffHours >= 23) {
-      const formatter = new Intl.DateTimeFormat('fr-FR', {
-        weekday: 'short',
-        day: '2-digit',
-        month: 'long',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-      const parts = formatter.formatToParts(scheduledAt);
-      const weekday = parts.find((p) => p.type === 'weekday')?.value;
-      const day = parts.find((p) => p.type === 'day')?.value;
-      const month = parts.find((p) => p.type === 'month')?.value;
-      const hour = parts.find((p) => p.type === 'hour')?.value;
-      const minute = parts.find((p) => p.type === 'minute')?.value;
-
-      return `Envoi programmé : ${weekday} ${day} ${month} à ${hour}:${minute}`;
-    } else {
-      const formatter = new Intl.DateTimeFormat('fr-FR', {
-        weekday: 'short',
-        day: '2-digit',
-        month: 'long',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-      const parts = formatter.formatToParts(scheduledAt);
-      const weekday = parts.find((p) => p.type === 'weekday')?.value;
-      const day = parts.find((p) => p.type === 'day')?.value;
-      const month = parts.find((p) => p.type === 'month')?.value;
-      const hour = parts.find((p) => p.type === 'hour')?.value;
-      const minute = parts.find((p) => p.type === 'minute')?.value;
-
-      return `Envoi programmé : ${weekday} ${day} ${month} à ${hour}:${minute}`;
     }
+
+    // More than 23 hours until send
+    return `Envoi programmé : ${weekday} ${day} ${month} à ${hour}:${minute}`;
   }, [workshop.start_at, preEmailSentDate]);
 
+  // Get workshop family code from joined data
+  const workshopFamilyCode = (workshop as any)?.workshop_family?.code;
+
   useEffect(() => {
-    if (!workshop?.workshop_family_id || !workshop?.language) {
+    if (!workshopFamilyCode || !workshop?.language) {
       setIsInitializing(false);
       return;
     }
     setIsInitializing(false);
-  }, [workshop?.workshop_family_id, workshop?.language]);
+  }, [workshopFamilyCode, workshop?.language]);
 
-  // Auto-open accordion based on email status
+  // Track if we've done initial accordion open
+  const [hasInitializedAccordion, setHasInitializedAccordion] = useState(false);
+
+  // Auto-open accordion only once on mount, based on workshop date
   useEffect(() => {
-    // Only auto-open if no accordion is currently selected
-    if (activeAccordion === '' && !isInitializing) {
-      if (!preEmailSentDate) {
-        // Pre-email not sent yet, open pre-email section
-        onAccordionChange('pre-email');
-      } else {
-        // Pre-email has been sent, open post-email section
+    if (!hasInitializedAccordion && !isInitializing) {
+      // Open pre-email if workshop hasn't started, post-email if it has
+      if (isPastWorkshop) {
         onAccordionChange('post-email');
+      } else {
+        onAccordionChange('pre-email');
       }
+      setHasInitializedAccordion(true);
     }
-  }, [preEmailSentDate, activeAccordion, isInitializing, onAccordionChange]);
+  }, [isPastWorkshop, hasInitializedAccordion, isInitializing, onAccordionChange]);
 
   useEffect(() => {
-    if (!workshop?.workshop_family_id || !workshop?.language) {
+    if (!workshopFamilyCode || !workshop?.language) {
       setLoadError("Données de l'atelier incomplètes");
       return;
     }
@@ -260,10 +251,10 @@ export function CommunicationTab({
     } else if (activeAccordion === 'post-email' && !templatesLoaded.post) {
       loadTemplates('post');
     }
-  }, [activeAccordion, workshop?.workshop_family_id, workshop?.language]);
+  }, [activeAccordion, workshopFamilyCode, workshop?.language]);
 
   const loadTemplates = async (type: 'pre' | 'post') => {
-    if (!workshop?.workshop_family_id || !workshop?.language || !currentUserId) {
+    if (!workshopFamilyCode || !workshop?.language || !currentUserId) {
       console.warn('Missing required data for loading templates');
       return;
     }
@@ -271,11 +262,11 @@ export function CommunicationTab({
     try {
       setLoadError(null);
       const [official, personal] = await Promise.all([
-        fetchOfficialTemplate(workshop.workshop_family_id, workshop.language, type).catch((err) => {
+        fetchOfficialTemplate(workshopFamilyCode, workshop.language, type).catch((err) => {
           console.error('Error fetching official template:', err);
           return null;
         }),
-        fetchPersonalTemplate(currentUserId, workshop.workshop_family_id, workshop.language, type).catch(
+        fetchPersonalTemplate(currentUserId, workshopFamilyCode, workshop.language, type).catch(
           (err) => {
             console.error('Error fetching personal template:', err);
             return null;
@@ -391,17 +382,6 @@ export function CommunicationTab({
 
       setEditorKey((prev) => ({ ...prev, [type]: prev[type] + 1 }));
 
-      if (state.personalTemplate) {
-        try {
-          await updateLastViewedOfficialVersion(
-            state.personalTemplate.id,
-            state.officialTemplate.official_version
-          );
-        } catch (error) {
-          console.error('Error updating viewed version:', error);
-        }
-      }
-
       toast({
         description: 'Template officiel chargé avec succès',
       });
@@ -501,6 +481,7 @@ export function CommunicationTab({
           content,
           savedSubject: subject,
           savedContent: content,
+          isDirty: false,
           loadedTemplate: 'none',
         }));
       } else if (type === 'post') {
@@ -524,6 +505,7 @@ export function CommunicationTab({
           content,
           savedSubject: subject,
           savedContent: content,
+          isDirty: false,
           loadedTemplate: 'none',
         }));
       }
@@ -546,7 +528,7 @@ export function CommunicationTab({
     try {
       const savedTemplate = await savePersonalTemplate(
         currentUserId,
-        workshop.workshop_family_id,
+        workshopFamilyCode,
         workshop.language,
         type,
         subject,
@@ -856,7 +838,7 @@ export function CommunicationTab({
     );
   }
 
-  if (!workshop.workshop_family_id || !workshop.language) {
+  if (!workshopFamilyCode || !workshop.language) {
     return (
       <div className="w-full">
         <Alert variant="destructive">

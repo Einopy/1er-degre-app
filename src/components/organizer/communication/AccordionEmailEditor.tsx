@@ -421,7 +421,7 @@ export function AccordionEmailEditor({
                   <FileText className="h-4 w-4 mr-2" />
                   {loadedTemplate === 'official' && 'Template officiel'}
                   {loadedTemplate === 'personal' && 'Mon template'}
-                  {loadedTemplate === 'none' && 'Charger un template'}
+                  {loadedTemplate === 'none' && 'Custom template'}
                   <ChevronDown className="h-4 w-4 ml-2" />
                 </Button>
               </DropdownMenuTrigger>

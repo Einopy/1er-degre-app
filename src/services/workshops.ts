@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import type { Workshop, User, WorkshopFamily, WorkshopType } from '@/lib/database.types';
+import { USER_COLUMNS_COMPACT } from '@/lib/user-columns';
 
 export interface WorkshopWithRelations extends Workshop {
   workshop_family?: WorkshopFamily | null;
@@ -14,6 +15,7 @@ export interface WorkshopFilters {
   startDate?: Date;
   endDate?: Date;
   partySize?: number;
+  isFormation?: boolean; // true = seulement formations, false = seulement ateliers, undefined = ateliers (par défaut)
 }
 
 export interface WorkshopListResult {
@@ -117,10 +119,18 @@ export async function fetchWorkshops(
       );
     }
 
-    // Filter out formation workshops (only show regular workshops)
-    filteredWorkshops = filteredWorkshops.filter((w) =>
-      w.workshop_type && !w.workshop_type.is_formation
-    );
+    // Filter by formation/workshop type
+    if (filters.isFormation === true) {
+      // Mode formation : uniquement les formations
+      filteredWorkshops = filteredWorkshops.filter((w) =>
+        w.workshop_type && w.workshop_type.is_formation
+      );
+    } else {
+      // Mode par défaut : exclure les formations (seulement ateliers classiques)
+      filteredWorkshops = filteredWorkshops.filter((w) =>
+        w.workshop_type && !w.workshop_type.is_formation
+      );
+    }
 
     if (filters.partySize && filters.partySize > 0) {
       filteredWorkshops = filteredWorkshops.filter(
@@ -241,7 +251,7 @@ export async function fetchWorkshopById(id: string): Promise<WorkshopDetail | nu
 
     const { data: organizerUser, error: organizerError } = await supabase
       .from('users')
-      .select('*')
+      .select(USER_COLUMNS_COMPACT)
       .eq('id', workshopData.organizer)
       .maybeSingle();
 

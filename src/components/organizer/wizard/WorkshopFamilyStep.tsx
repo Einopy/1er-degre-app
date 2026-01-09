@@ -6,7 +6,7 @@ import { AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { WorkshopWizardData } from '@/lib/workshop-wizard-types';
 import type { User, WorkshopFamily } from '@/lib/database.types';
-import { getAvailableWorkshopFamilies } from '@/lib/organizer-utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface WorkshopFamilyStepProps {
   form: UseFormReturn<WorkshopWizardData>;
@@ -15,12 +15,19 @@ interface WorkshopFamilyStepProps {
   families?: WorkshopFamily[];
 }
 
-export function WorkshopFamilyStep({ form, user, validationError, families }: WorkshopFamilyStepProps) {
+export function WorkshopFamilyStep({ form, validationError, families }: WorkshopFamilyStepProps) {
   const { watch, setValue } = form;
   const workshopFamilyId = watch('workshop_family_id');
+  const { permissions } = useAuth();
 
-  const userFamilyCodes = getAvailableWorkshopFamilies(user);
-  const availableFamilies = (families || []).filter(f => userFamilyCodes.includes(f.code as any));
+  // Extraire les codes de famille depuis les permissions de l'utilisateur
+  const userFamilyCodes = new Set(
+    (permissions?.roleLevels || [])
+      .map(rl => rl.role_level?.workshop_family?.code)
+      .filter((code): code is string => !!code)
+  );
+  
+  const availableFamilies = (families || []).filter(f => userFamilyCodes.has(f.code));
 
   return (
     <div className="space-y-6">

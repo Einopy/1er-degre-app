@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useActiveClient } from '@/hooks/use-active-client';
+import { useWorkshopFamilies } from '@/hooks/use-client-config';
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +23,6 @@ import {
   Home,
   User,
   Database,
-  Briefcase,
   GraduationCap,
   FolderOpen,
   Store,
@@ -43,12 +43,11 @@ export function AppSidebar() {
   const { profile, permissions, signOut } = useAuth();
   const { activeClient } = useActiveClient();
   const location = useLocation();
-
-  // 🔍 Log à chaque rendu de la sidebar
-  console.log('[SIDEBAR] render, pathname =', location.pathname);
+  const { families } = useWorkshopFamilies(activeClient?.id);
 
   const isActiveRoute = (path: string) => location.pathname === path;
   const isActiveParent = (paths: string[]) => paths.some((p) => location.pathname === p);
+  const isParcoursActive = location.pathname.startsWith('/parcours');
 
   const handleSignOut = async () => {
     await signOut();
@@ -144,46 +143,57 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={isActiveRoute('/my-journey')}>
-                  <Link to="/my-journey">
-                    <GraduationCap className="h-4 w-4" />
-                    <span>Mon parcours</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              <Collapsible defaultOpen={isActiveParent(['/formation/FDFP', '/formation/HD'])}>
+              {/* Mon Parcours - dynamique selon les familles */}
+              {families.length === 0 ? (
+                // Aucune famille - lien vers parcours qui affichera un message
                 <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                      <Briefcase className="h-4 w-4" />
-                      <span>Mes formations</span>
-                      <ChevronDown className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton asChild isActive={isActiveRoute('/formation/FDFP')}>
-                          <Link to="/formation/FDFP">
-                            <GraduationCap className="h-4 w-4" />
-                            <span>🌱 Formation FDFP</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton asChild isActive={isActiveRoute('/formation/HD')}>
-                          <Link to="/formation/HD">
-                            <GraduationCap className="h-4 w-4" />
-                            <span>🌊 Formation HD</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
+                  <SidebarMenuButton asChild isActive={isParcoursActive}>
+                    <Link to="/parcours">
+                      <GraduationCap className="h-4 w-4" />
+                      <span>Mon Parcours</span>
+                    </Link>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
-              </Collapsible>
+              ) : families.length === 1 ? (
+                // Une seule famille - lien direct
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={isParcoursActive}>
+                    <Link to={`/parcours/${families[0].code}`}>
+                      <GraduationCap className="h-4 w-4" />
+                      <span>Mon Parcours</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ) : (
+                // Plusieurs familles - menu dépliable
+                <Collapsible defaultOpen={isParcoursActive}>
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton>
+                        <GraduationCap className="h-4 w-4" />
+                        <span>Mon Parcours</span>
+                        <ChevronDown className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {families.map((family) => (
+                          <SidebarMenuSubItem key={family.id}>
+                            <SidebarMenuSubButton 
+                              asChild 
+                              isActive={isActiveRoute(`/parcours/${family.code}`)}
+                            >
+                              <Link to={`/parcours/${family.code}`}>
+                                <span>{family.name}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              )}
 
               <Collapsible defaultOpen={isActiveParent(['/resources/fdfp', '/resources/hd'])}>
                 <SidebarMenuItem>

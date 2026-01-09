@@ -19,11 +19,9 @@ import {
   Mail,
   Info,
 } from 'lucide-react';
-import { ImageUploadField } from '@/components/ui/image-upload-field';
 import type { WorkshopWizardData, WizardStep } from '@/lib/workshop-wizard-types';
 import type { User, WorkshopFamily, WorkshopType } from '@/lib/database.types';
 import {
-  getClassificationLabel,
   getWorkshopPrice,
   formatPrice,
 } from '@/lib/workshop-utils';
@@ -36,8 +34,6 @@ interface ReviewStepProps {
   workshopTypes?: WorkshopType[];
   onEditStep: (step: WizardStep) => void;
   isPastWorkshop?: boolean;
-  workshopImagePath?: string | null;
-  onWorkshopImageChange?: (path: string | null) => void;
 }
 
 export function ReviewStep({
@@ -47,8 +43,6 @@ export function ReviewStep({
   workshopTypes,
   onEditStep,
   isPastWorkshop = false,
-  workshopImagePath,
-  onWorkshopImageChange,
 }: ReviewStepProps) {
   const { watch, setValue } = form;
   const data = watch();
@@ -59,8 +53,19 @@ export function ReviewStep({
 
   const baseDuration = selectedType?.default_duration_minutes || 180;
   const totalDuration = baseDuration + (data.extra_duration_minutes || 0);
-  const endTime = data.start_at
-    ? new Date(data.start_at.getTime() + totalDuration * 60000)
+  
+  // Construire la date/heure de début avec start_time
+  const getStartDateTime = () => {
+    if (!data.start_at || !data.start_time) return data.start_at;
+    const [hours, minutes] = data.start_time.split(':').map(Number);
+    const dateTime = new Date(data.start_at);
+    dateTime.setHours(hours, minutes, 0, 0);
+    return dateTime;
+  };
+  
+  const startDateTime = getStartDateTime();
+  const endTime = startDateTime
+    ? new Date(startDateTime.getTime() + totalDuration * 60000)
     : null;
 
   const isFormationType = selectedType?.is_formation || false;
@@ -123,7 +128,7 @@ export function ReviewStep({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onEditStep('classification-coorg')}
+              onClick={() => onEditStep('family-type-language')}
             >
               <Edit className="h-4 w-4 mr-2" />
               Modifier
@@ -132,17 +137,12 @@ export function ReviewStep({
           <div className="rounded-lg border p-4 space-y-3 bg-card">
             <div>
               <p className="text-sm text-muted-foreground">Famille d'atelier</p>
-              <p className="font-medium">{selectedFamily?.name || 'Non spécifiée'}</p>
+              <p className="font-medium">{selectedFamily?.code || 'Non spécifiée'}</p>
             </div>
             <Separator />
             <div>
               <p className="text-sm text-muted-foreground">Type</p>
               <p className="font-medium">{selectedType?.label || 'Non spécifié'}</p>
-            </div>
-            <Separator />
-            <div>
-              <p className="text-sm text-muted-foreground">Classification</p>
-              <p className="font-medium">{getClassificationLabel(data.classification_status)}</p>
             </div>
             <Separator />
             <div>
@@ -179,7 +179,7 @@ export function ReviewStep({
               <div className="flex-1">
                 <p className="text-sm text-muted-foreground">Date</p>
                 <p className="font-medium">
-                  {format(data.start_at, 'EEEE d MMMM yyyy', { locale: fr })}
+                  {startDateTime ? format(startDateTime, 'EEEE d MMMM yyyy', { locale: fr }) : 'Non définie'}
                 </p>
               </div>
             </div>
@@ -189,7 +189,7 @@ export function ReviewStep({
               <div className="flex-1">
                 <p className="text-sm text-muted-foreground">Horaires</p>
                 <p className="font-medium">
-                  {format(data.start_at, 'HH:mm', { locale: fr })} -{' '}
+                  {data.start_time || '--:--'} -{' '}
                   {endTime ? format(endTime, 'HH:mm', { locale: fr }) : '...'}
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -207,26 +207,6 @@ export function ReviewStep({
             </div>
           </div>
         </div>
-
-        {onWorkshopImageChange && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Image de l'atelier</h3>
-            </div>
-            <div className="rounded-lg border p-4 bg-card">
-              <ImageUploadField
-                label=""
-                value={workshopImagePath}
-                onChange={onWorkshopImageChange}
-                bucket="workshop-images"
-                maxSizeMB={2}
-              />
-              <p className="text-xs text-muted-foreground mt-2">
-                Cette image sera affichée sur la carte de l'atelier. Si aucune image n'est fournie, l'image par défaut de la famille d'atelier sera utilisée.
-              </p>
-            </div>
-          </div>
-        )}
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -351,18 +331,18 @@ export function ReviewStep({
                 </div>
               </>
             )}
-            <Separator />
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Tarification</p>
-              {priceInfo ? (
-                <div className="flex items-center justify-between text-sm">
-                  <span>{priceInfo.label}</span>
-                  <span className="font-medium">{formatPrice(priceInfo.price)}</span>
+            {!isFormationType && priceInfo && (
+              <>
+                <Separator />
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Tarification</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>{priceInfo.label}</span>
+                    <span className="font-medium">{formatPrice(priceInfo.price)}</span>
+                  </div>
                 </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">Non défini</p>
-              )}
-            </div>
+              </>
+            )}
           </div>
         </div>
 

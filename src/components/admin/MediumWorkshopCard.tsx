@@ -76,8 +76,8 @@ export const MediumWorkshopCard = memo(function MediumWorkshopCard({
     ? 'À distance'
     : location?.city || 'Lieu non défini';
 
-  const isWorkshopWithDetails = 'organizer_user' in workshop;
-  const organizerName = isWorkshopWithDetails && workshop.organizer_user
+  const isWorkshopWithDetails = 'participants_count' in workshop;
+  const organizerName = workshop.organizer_user
     ? `${workshop.organizer_user.first_name} ${workshop.organizer_user.last_name}`
     : 'Non assigné';
 
@@ -135,7 +135,7 @@ export const MediumWorkshopCard = memo(function MediumWorkshopCard({
     >
       <div className="p-4 hover:bg-muted/30 transition-colors">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0 space-y-3">
+          <div className="flex-1 min-w-0 space-y-4">
             <div className="flex items-center gap-2 flex-wrap">
               <StatusBadge
                 variant={statusConfig.variant}
@@ -171,9 +171,9 @@ export const MediumWorkshopCard = memo(function MediumWorkshopCard({
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-              <div className="flex items-center gap-1.5 text-muted-foreground text-sm ml-auto">
+              <div className="flex items-center gap-1.5 text-foreground text-sm ml-auto">
                 <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
-                <span>
+                <span className="font-medium">
                   {format(workshopDate, 'dd MMM yyyy', { locale: fr })} · {format(workshopDate, 'HH:mm')}
                 </span>
               </div>
@@ -196,9 +196,9 @@ export const MediumWorkshopCard = memo(function MediumWorkshopCard({
 
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-4 text-sm flex-wrap">
-                <div className="flex items-center gap-1.5 text-foreground">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
                   <UserCircle className="h-3.5 w-3.5 flex-shrink-0" />
-                  <span className="font-medium">{organizerName}</span>
+                  <span>{organizerName}</span>
                 </div>
 
                 {coOrganizerNames.length > 0 && (
